@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [[ $EMULATOR == "" ]]; then
-    EMULATOR="android-19"
+    EMULATOR="android-28"
     echo "Using default emulator $EMULATOR"
 fi
 
@@ -32,5 +32,5 @@ else
     EMU="arm"
 fi
 
-echo "no" | /usr/local/android-sdk/tools/android create avd -f -n test -t ${EMULATOR} --abi default/${ARCH}
-echo "no" | /usr/local/android-sdk/tools/emulator64-${EMU} -avd test -noaudio -no-window -gpu off -verbose -qemu -usbdevice tablet -vnc :0
+echo "no" | /usr/local/android-sdk/tools/bin/avdmanager create avd -f -n test -k "system-images;${EMULATOR};google_apis;${ARCH}"
+echo "no" | /usr/local/android-sdk/emulator/emulator -avd test -noaudio -no-window -gpu off -verbose -qemu -usbdevice tablet -vnc :0

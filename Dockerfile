@@ -21,30 +21,33 @@ RUN echo "debconf shared/accepted-oracle-license-v1-1 select true" | debconf-set
 
 # Update packages
 RUN apt-get -y update && \
-    apt-get -y install software-properties-common bzip2 ssh net-tools openssh-server socat curl && \
+    apt-get -y install software-properties-common bzip2 ssh net-tools openssh-server socat curl unzip libgl1-mesa-dev libqt5gui5 libpulse0 && \
     add-apt-repository ppa:webupd8team/java && \
     apt-get update && \
-    apt-get -y install oracle-java7-installer && \
+    apt-get -y install oracle-java8-installer && \
     rm -rf /var/lib/apt/lists/*
 
 # Install android sdk
-RUN wget -qO- http://dl.google.com/android/android-sdk_r23-linux.tgz | \
-    tar xvz -C /usr/local/ && \
-    mv /usr/local/android-sdk-linux /usr/local/android-sdk && \
+RUN curl -O https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip && \
+    unzip sdk-tools-linux-4333796.zip -d /usr/local/ && \
+    rm sdk-tools-linux-4333796.zip && \
+    mkdir /usr/local/android-sdk && \
+    mv /usr/local/tools /usr/local/android-sdk/tools && \
     chown -R root:root /usr/local/android-sdk/
 
 # Add android tools and platform tools to PATH
 ENV ANDROID_HOME /usr/local/android-sdk
+ENV ANDROID_SDK_ROOT $ANDROID_HOME
 ENV PATH $PATH:$ANDROID_HOME/tools
+ENV PATH $PATH:$ANDROID_HOME/tools/bin
 ENV PATH $PATH:$ANDROID_HOME/platform-tools
 
 # Export JAVA_HOME variable
-ENV JAVA_HOME /usr/lib/jvm/java-7-oracle
+ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
 
 # Install latest android tools and system images
-RUN ( sleep 4 && while [ 1 ]; do sleep 1; echo y; done ) | android update sdk --no-ui --force -a --filter \
-    platform-tool,android-19,android-21,android-22,build-tools-22.0.1,sys-img-x86-android-19,sys-img-x86-android-21,sys-img-x86-android-22,sys-img-armeabi-v7a-android-19,sys-img-armeabi-v7a-android-21,sys-img-armeabi-v7a-android-22 && \
-    echo "y" | android update adb
+RUN ls /usr/local/android-sdk/tools/bin && yes | sdkmanager --licenses && \
+    sdkmanager "platform-tools" "platforms;android-28" "system-images;android-28;google_apis_playstore;x86" "emulator"
 
 # Create fake keymap file
 RUN mkdir /usr/local/android-sdk/tools/keymaps && \
