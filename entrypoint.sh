@@ -32,5 +32,5 @@ else
     EMU="arm"
 fi
 
-echo "no" | /usr/local/android-sdk/tools/bin/avdmanager create avd -f -n test -k "system-images;${EMULATOR};google_apis;${ARCH}"
+echo "no" | /usr/local/android-sdk/tools/bin/avdmanager create avd -f -n test -k "system-images;${EMULATOR};google_apis_playstore;${ARCH}"
 echo "no" | /usr/local/android-sdk/emulator/emulator -avd test -noaudio -no-window -gpu off -verbose -qemu -usbdevice tablet -vnc :0
